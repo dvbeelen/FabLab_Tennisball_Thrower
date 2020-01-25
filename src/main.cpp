@@ -1,31 +1,30 @@
 #include <Arduino.h>
-
+#include <Ultrasonic.h>
+#include <Servo.h>
 //Define pins
-const int trigPin = 9;
-const int echoPin = 10;
 
-long duration;
-int distance;
+Servo katapultServo;
+Ultrasonic ultrasonic(9, 10);
+
 
 void setup() {
-  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
-  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
-  Serial.begin(9600); // Starts the serial communication
+  Serial.begin(9600);
+  katapultServo.attach(8);
 }
 
 void loop() {
-  digitalWrite(trigPin, LOW);
-  delay(200);
-// Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(trigPin, HIGH);
-  delay(200);
-  digitalWrite(trigPin, LOW);
-// Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPin, HIGH);
-// Calculating the distance
-  distance= duration*0.034/2;
-// Prints the distance on the Serial Monitor
-  Serial.print("Distance: ");
+  int distance = ultrasonic.read();
+  Serial.print("Distance in CM: ");
+  // Pass INC as a parameter to get the distance in inches
   Serial.println(distance);
+  delay(1000);
 
+  if (distance < 50 ) {
+    katapultServo.write(10);
+    delay(1000);
+  } 
+  else {
+    katapultServo.write(180);
+    delay(1000);
+  }
 }
